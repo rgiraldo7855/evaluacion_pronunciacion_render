@@ -5,4 +5,3 @@ scipy
 pandas
 psutil
 gtts
-pyaudioop==0.1.2
