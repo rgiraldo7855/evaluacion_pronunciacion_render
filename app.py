@@ -391,5 +391,16 @@ with gr.Blocks(
         inputs=None,
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
+# =============================================================
+# 🚀 EJECUCIÓN PRINCIPAL (COMPATIBLE CON RENDER Y HUGGING FACE)
+# =============================================================
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", 7860)), share=False)
+    # Detecta si estamos en Render (variable de entorno PORT)
+    port = int(os.getenv("PORT", 7860))
+    demo.launch(
+        server_name="0.0.0.0",   # Render requiere escuchar en todas las interfaces
+        server_port=port,        # Usa el puerto asignado por Render
+        share=False,             # Evita túneles temporales
+        show_error=True,         # Muestra errores directamente en consola
+        debug=False
+    )
