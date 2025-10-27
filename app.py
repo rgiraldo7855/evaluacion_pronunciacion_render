@@ -392,29 +392,30 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN PRINCIPAL (UNIVERSAL: LOCAL, RENDER Y HUGGING FACE)
+# 🚀 EJECUCIÓN PRINCIPAL (FUNCIONA EN LOCAL, RENDER Y HUGGING FACE)
 # =============================================================
 if __name__ == "__main__":
     import socket
 
-    # Detectar si estamos en Render o en entorno sin localhost
-    host_env = os.getenv("RENDER", None) or os.getenv("SPACE_ID", None)
+    port = int(os.getenv("PORT", 7860))
+    host_env = (
+        os.getenv("RENDER_EXTERNAL_URL")  # Render
+        or os.getenv("SPACE_ID")           # Hugging Face
+        or None
+    )
 
-    # Configuración universal
     try:
-        port = int(os.getenv("PORT", 7860))
         if host_env:
-            # 🌐 Modo nube (Render o Hugging Face)
             print("🌍 Ejecutando en entorno de nube (Render/Hugging Face)...")
             demo.launch(
                 server_name="0.0.0.0",
                 server_port=port,
-                share=True,           # 🔑 Fuerza el enlace compartido
+                share=True,           # ✅ Necesario cuando localhost no es accesible
                 show_error=True,
                 debug=False
             )
         else:
-            # 💻 Modo local
+            print("💻 Ejecutando en entorno local...")
             demo.launch(
                 server_name="localhost",
                 server_port=7860,
