@@ -392,15 +392,35 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN PRINCIPAL (COMPATIBLE CON RENDER Y HUGGING FACE)
+# 🚀 EJECUCIÓN PRINCIPAL (UNIVERSAL: LOCAL, RENDER Y HUGGING FACE)
 # =============================================================
 if __name__ == "__main__":
-    # Detecta si estamos en Render (variable de entorno PORT)
-    port = int(os.getenv("PORT", 7860))
-    demo.launch(
-        server_name="0.0.0.0",   # Render requiere escuchar en todas las interfaces
-        server_port=port,        # Usa el puerto asignado por Render
-        share=False,             # Evita túneles temporales
-        show_error=True,         # Muestra errores directamente en consola
-        debug=False
-    )
+    import socket
+
+    # Detectar si estamos en Render o en entorno sin localhost
+    host_env = os.getenv("RENDER", None) or os.getenv("SPACE_ID", None)
+
+    # Configuración universal
+    try:
+        port = int(os.getenv("PORT", 7860))
+        if host_env:
+            # 🌐 Modo nube (Render o Hugging Face)
+            print("🌍 Ejecutando en entorno de nube (Render/Hugging Face)...")
+            demo.launch(
+                server_name="0.0.0.0",
+                server_port=port,
+                share=True,           # 🔑 Fuerza el enlace compartido
+                show_error=True,
+                debug=False
+            )
+        else:
+            # 💻 Modo local
+            demo.launch(
+                server_name="localhost",
+                server_port=7860,
+                share=False,
+                show_error=True,
+                debug=True
+            )
+    except Exception as e:
+        print("❌ Error al lanzar la aplicación:", e)
