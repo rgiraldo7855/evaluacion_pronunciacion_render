@@ -392,25 +392,26 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN PRINCIPAL (Render / Hugging Face / Local)
+# 🚀 EJECUCIÓN PRINCIPAL UNIVERSAL (Render, HF, o Local)
 # =============================================================
 if __name__ == "__main__":
     import socket
 
-    # Detecta entorno de ejecución
     port = int(os.getenv("PORT", 7860))
     is_render = bool(os.getenv("RENDER_EXTERNAL_URL"))
     is_hf = bool(os.getenv("SPACE_ID"))
 
-    # Render y Hugging Face requieren 0.0.0.0, sin túnel
+    # Si está en Render o Hugging Face
     if is_render or is_hf:
-        print("🌍 Ejecutando en entorno de nube (Render o Hugging Face)...")
+        print("🌍 Ejecutando en entorno de nube (Render/Hugging Face)...")
+        # Gradio necesita un link compartido en este entorno
         demo.launch(
             server_name="0.0.0.0",
             server_port=port,
-            share=False,           # 🔒 Sin túnel, Render ya expone la app
+            share=True,              # 🔑 Obligatorio cuando localhost no está accesible
             show_error=True,
-            debug=False
+            debug=False,
+            prevent_thread_lock=True # Evita el bloqueo ASGI
         )
     else:
         print("💻 Ejecutando en entorno local...")
