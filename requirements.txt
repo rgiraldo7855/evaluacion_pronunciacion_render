@@ -1,8 +1,8 @@
-gradio==4.44.0
+gradio==4.46.0
 vosk==0.3.45
 numpy
 scipy
 pandas
 psutil
 gtts
-huggingface_hub==0.16.4
+
