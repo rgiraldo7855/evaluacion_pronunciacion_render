@@ -392,17 +392,24 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (ASGI)
+# 🚀 EJECUCIÓN PRINCIPAL (Render / Hugging Face / Local)
 # =============================================================
 import uvicorn
 
 if __name__ == "__main__":
-    import socket
+    import os
 
     port = int(os.getenv("PORT", 7860))
     host = "0.0.0.0"
 
-    print(f"🌍 Ejecutando en entorno de nube (Render) en {host}:{port} ...")
+    print(f"🌍 Ejecutando en entorno de nube (Render/Hugging Face) en {host}:{port} ...")
 
-    # Ejecutar directamente como aplicación ASGI
-    uvicorn.run(demo, host=host, port=port)
+    # Convertir el objeto gradio.Blocks a una app ASGI válida
+    app = gr.mount_gradio_app(
+        app=None,                 # no hay FastAPI externa
+        blocks=demo,              # tu interfaz Gradio
+        path="/"                  # raíz del sitio
+    )
+
+    # Ejecutar con Uvicorn
+    uvicorn.run(app, host=host, port=port)
