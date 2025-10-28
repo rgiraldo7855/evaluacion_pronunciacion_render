@@ -392,22 +392,29 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (Gradio 4.x)
+# 🚀 EJECUCIÓN COMPATIBLE CON RENDER Y LOCAL
 # =============================================================
-if __name__ == "__main__":
-    import os
+import os
 
+if __name__ == "__main__":
     port = int(os.getenv("PORT", 7860))
     host = "0.0.0.0"
 
     print(f"🌍 Ejecutando en entorno Render en {host}:{port} ...")
 
-    demo.launch(
-        server_name=host,
-        server_port=port,
-        share=True,          # Necesario en Render; crea enlace interno pero lo ignora si ya hay proxy
-        show_error=True,
-        debug=False,
-        inbrowser=False,     # No intenta abrir navegador
-        prevent_thread_lock=True  # Evita bloqueo ASGI
-    )
+    # Detectar si estamos en Render (no hay navegador local)
+    is_render = bool(os.getenv("RENDER"))
+    share_mode = False  # NO usaremos túnel externo
+
+    try:
+        demo.queue().launch(
+            server_name=host,
+            server_port=port,
+            share=share_mode,
+            inbrowser=False,
+            show_error=True,
+            debug=False,
+            prevent_thread_lock=False,  # mantiene el hilo principal activo
+        )
+    except Exception as e:
+        print(f"🚨 Error al lanzar la app: {e}")
