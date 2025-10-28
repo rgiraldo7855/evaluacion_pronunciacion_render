@@ -1,4 +1,4 @@
-gradio==4.43.0
+gradio==5.2.0
 huggingface_hub==0.24.5
 vosk==0.3.45
 numpy
@@ -6,4 +6,5 @@ scipy
 pandas
 psutil
 gtts
+uvicorn
 

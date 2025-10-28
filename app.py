@@ -392,32 +392,17 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN PRINCIPAL (MODO UNIVERSAL RENDER / HF / LOCAL)
+# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (ASGI)
 # =============================================================
+import uvicorn
+
 if __name__ == "__main__":
     import socket
 
     port = int(os.getenv("PORT", 7860))
-    is_render = os.getenv("RENDER_EXTERNAL_URL") is not None
-    is_hf = os.getenv("SPACE_ID") is not None
+    host = "0.0.0.0"
 
-    if is_render or is_hf:
-        print("🌍 Ejecutando en entorno de nube (Render/Hugging Face)...")
-        demo.launch(
-            server_name="0.0.0.0",
-            server_port=port,
-            share=False,            # ❌ No túneles (Render ya expone la app)
-            show_error=True,
-            debug=False,
-            inbrowser=False,        # 🧱 Evita abrir navegador
-            allowed_paths=["/"]     # 🛡️ Corrige el bug del TypeError (bool iterable)
-        )
-    else:
-        print("💻 Ejecutando en entorno local...")
-        demo.launch(
-            server_name="127.0.0.1",
-            server_port=7860,
-            share=False,
-            show_error=True,
-            debug=True
-        )
+    print(f"🌍 Ejecutando en entorno de nube (Render) en {host}:{port} ...")
+
+    # Ejecutar directamente como aplicación ASGI
+    uvicorn.run(demo, host=host, port=port)
