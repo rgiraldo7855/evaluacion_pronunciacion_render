@@ -392,11 +392,8 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (FASTAPI + GRADIO)
+# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (Gradio 4.x)
 # =============================================================
-from fastapi import FastAPI
-import uvicorn
-
 if __name__ == "__main__":
     import os
 
@@ -405,19 +402,11 @@ if __name__ == "__main__":
 
     print(f"🌍 Ejecutando en entorno Render en {host}:{port} ...")
 
-    # Crear una app base FastAPI
-    fastapi_app = FastAPI()
-
-    # Convertir Blocks en app ASGI sin usar mount_gradio_app (que da error)
-    @fastapi_app.get("/")
-    def root():
-        return {"status": "Gradio app running"}
-
-    # Crear app ASGI de Gradio manualmente (evita bug interno)
-    gradio_app = demo.asgi_app()
-
-    # Montar manualmente la ruta de Gradio
-    fastapi_app.mount("/", gradio_app)
-
-    # Ejecutar con Uvicorn
-    uvicorn.run(fastapi_app, host=host, port=port)
+    demo.launch(
+        server_name=host,
+        server_port=port,
+        share=True,          # Necesario en Render; crea enlace interno pero lo ignora si ya hay proxy
+        show_error=True,
+        debug=False,
+        inbrowser=False,     # No intenta abrir navegador
+        prevent_thread_lock=True  # Evita bloqueo ASGI
