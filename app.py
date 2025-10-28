@@ -394,6 +394,7 @@ with gr.Blocks(
 # =============================================================
 # 🚀 EJECUCIÓN PRINCIPAL (Render / Hugging Face / Local)
 # =============================================================
+from fastapi import FastAPI
 import uvicorn
 
 if __name__ == "__main__":
@@ -404,12 +405,11 @@ if __name__ == "__main__":
 
     print(f"🌍 Ejecutando en entorno de nube (Render/Hugging Face) en {host}:{port} ...")
 
-    # Convertir el objeto gradio.Blocks a una app ASGI válida
-    app = gr.mount_gradio_app(
-        app=None,                 # no hay FastAPI externa
-        blocks=demo,              # tu interfaz Gradio
-        path="/"                  # raíz del sitio
-    )
+    # Crear la app base de FastAPI
+    fastapi_app = FastAPI()
 
-    # Ejecutar con Uvicorn
+    # Montar Gradio sobre FastAPI
+    app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+
+    # Iniciar con Uvicorn
     uvicorn.run(app, host=host, port=port)

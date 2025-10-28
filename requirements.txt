@@ -1,9 +1,10 @@
 gradio==4.44.1
-huggingface_hub==0.19.4
 uvicorn
+fastapi
 pandas
 numpy
 scipy
 vosk
 gtts
 psutil
+huggingface_hub==0.19.4
