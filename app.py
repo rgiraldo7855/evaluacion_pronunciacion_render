@@ -392,7 +392,7 @@ with gr.Blocks(
         outputs=[ref_box, result_percent, result_grade, missing_box, trans_box, custom_text, result_link])
 
 # =============================================================
-# 🚀 EJECUCIÓN PRINCIPAL (Render / Hugging Face / Local)
+# 🚀 EJECUCIÓN COMPATIBLE CON RENDER (FASTAPI + GRADIO)
 # =============================================================
 from fastapi import FastAPI
 import uvicorn
@@ -403,13 +403,21 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 7860))
     host = "0.0.0.0"
 
-    print(f"🌍 Ejecutando en entorno de nube (Render/Hugging Face) en {host}:{port} ...")
+    print(f"🌍 Ejecutando en entorno Render en {host}:{port} ...")
 
-    # Crear la app base de FastAPI
+    # Crear una app base FastAPI
     fastapi_app = FastAPI()
 
-    # Montar Gradio sobre FastAPI
-    app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+    # Convertir Blocks en app ASGI sin usar mount_gradio_app (que da error)
+    @fastapi_app.get("/")
+    def root():
+        return {"status": "Gradio app running"}
 
-    # Iniciar con Uvicorn
-    uvicorn.run(app, host=host, port=port)
+    # Crear app ASGI de Gradio manualmente (evita bug interno)
+    gradio_app = demo.asgi_app()
+
+    # Montar manualmente la ruta de Gradio
+    fastapi_app.mount("/", gradio_app)
+
+    # Ejecutar con Uvicorn
+    uvicorn.run(fastapi_app, host=host, port=port)
