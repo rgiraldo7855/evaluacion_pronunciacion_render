@@ -410,3 +410,4 @@ if __name__ == "__main__":
         debug=False,
         inbrowser=False,     # No intenta abrir navegador
         prevent_thread_lock=True  # Evita bloqueo ASGI
+    )
